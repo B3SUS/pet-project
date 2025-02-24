@@ -17,7 +17,7 @@ interface Props{
     className?: string
 }
 
-export const Header: React.FC<Props> = ({className}) => {
+export const Header: React.FC<Props> = ({}) => {
     return(
         <header className={'flex justify-center'}>
             <Container className={'flex justify-between py-6'}>
