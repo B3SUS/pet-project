@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "../globals.css";
 import React from "react";
-import {Header} from "@/components/shared/header";
+import { Header } from "@/components/shared/header";
+import { BreadcrumbNav } from "@/components/shared/breadcrumb";
+import { Providers } from "@/components/shared/providers";
+import Footer from "@/components/shared/Footer";
+import Newsletter from "@/components/shared/Newsletter";
 
 const nunito = Nunito({
-    subsets: ['cyrillic'],
-    variable: '--font-nunito',
-    weight: ['400', '500', '600', '700', '800', '900'],
+  subsets: ["cyrillic"],
+  variable: "--font-nunito",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -23,10 +27,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nunito.variable}`}>
-      <main className={'min-h-screen'}>
-          <Header/>
-          {children}
-      </main>
+        <main className={"min-h-screen"}>
+          <Providers>
+            <Header />
+            <BreadcrumbNav />
+            {children}
+            <Newsletter />
+            <Footer />
+          </Providers>
+        </main>
       </body>
     </html>
   );

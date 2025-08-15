@@ -1,21 +1,24 @@
-export {Accordion} from './accordion'
-export {Avatar} from './avatar'
-export {Breadcrumb} from './breadcrumb'
-export {Button} from './button'
-export {Carousel} from './carousel'
-export {Checkbox} from './checkbox'
-export {Dialog} from './dialog'
-export {DropdownMenu} from './dropdown-menu'
-export {Form} from './form'
-export {Input} from './input'
-export {InputOTP} from './input-otp'
-export {Label} from './label'
-export {NavigationMenu} from './navigation-menu'
-export {NavigationMenuList} from './navigation-menu'
-export {NavigationMenuItem} from './navigation-menu'
-export {NavigationMenuTrigger} from './navigation-menu'
-export {NavigationMenuContent} from './navigation-menu'
-export {NavigationMenuLink} from './navigation-menu'
-export {Pagination} from './pagination'
-export {Skeleton} from './skeleton'
-export {Slider} from './slider'
+"use client";
+export { Accordion } from "./accordion";
+export { Avatar } from "./avatar";
+export { Breadcrumb } from "./breadcrumb";
+export { Button } from "./button";
+export { Checkbox } from "./checkbox";
+export { Dialog } from "./dialog";
+export { DropdownMenu } from "./dropdown-menu";
+export { Form } from "./form";
+export { Input } from "./input";
+export { InputOTP } from "./input-otp";
+export { Label } from "./label";
+export { NavigationMenu } from "./navigation-menu";
+export { NavigationMenuList } from "./navigation-menu";
+export { NavigationMenuItem } from "./navigation-menu";
+export { NavigationMenuTrigger } from "./navigation-menu";
+export { NavigationMenuContent } from "./navigation-menu";
+export { NavigationMenuLink } from "./navigation-menu";
+export { Pagination } from "./pagination";
+export { Skeleton } from "./skeleton";
+export { Slider } from "./slider";
+export { ToggleGroup } from "./toggle-group";
+export { ToggleGroupItem } from "./toggle-group";
+export { Badge } from "./badge";

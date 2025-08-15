@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model address {
+  id           Int            @id @default(autoincrement())
+  country      String?        @db.VarChar(50)
+  city         String?        @db.VarChar(50)
+  region       String?        @db.VarChar(50)
+  street       String?        @db.VarChar(100)
+  zip_code     Int?
+  shop_order   shop_order[]
+  user_address user_address[]
+}
+
+model category {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar(255)
+  parent_category_id Int?                 @default(autoincrement())
+  category           category?            @relation("categoryTocategory", fields: [parent_category_id], references: [id], onDelete: NoAction, map: "parent_category_id_fkey")
+  other_category     category[]           @relation("categoryTocategory")
+  product            product[]
+  promotion_category promotion_category[]
+  variation          variation[]
+}
+
+model order_line {
+  id              Int           @id @default(autoincrement())
+  product_item_id Int
+  order_id        Int
+  qty             Int
+  price           Int
+  shop_order      shop_order    @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_id_fkey")
+  product_item    product_item  @relation(fields: [product_item_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_item_id_fkey")
+  user_review     user_review[]
+}
+
+model order_status {
+  id         Int          @id @default(autoincrement())
+  status     String       @default("Pending") @db.VarChar(10)
+  shop_order shop_order[]
+}
+
+model payment_type {
+  id                  Int                   @id @default(autoincrement())
+  value               String                @db.VarChar(20)
+  user_payment_method user_payment_method[]
+}
+
+model product {
+  id            Int            @id @default(autoincrement())
+  category_id   Int            @default(autoincrement())
+  name          String         @db.VarChar(255)
+  description   String         @db.VarChar
+  product_image String
+  price         Decimal        @db.Decimal(10, 2)
+  category      category       @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "category_id_fkey")
+  product_item  product_item[]
+}
+
+model product_configuration {
+  id                  Int               @id @default(autoincrement())
+  product_item_id     Int?
+  variation_option_id Int?
+  product_item        product_item?     @relation(fields: [product_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  variation_option    variation_option? @relation(fields: [variation_option_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([product_item_id, variation_option_id])
+}
+
+model product_item {
+  id                    Int                     @id @default(autoincrement())
+  product_id            Int
+  qty                   Int
+  product_image         String                  @db.VarChar
+  order_line            order_line[]
+  product_configuration product_configuration[]
+  product               product                 @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "product_id_fkey")
+  shopping_cart_item    shopping_cart_item[]
+}
+
+model promotion {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar
+  description        String?              @db.VarChar
+  discount_rate      Int
+  start_date         DateTime             @db.Timestamp(6)
+  end_date           DateTime             @db.Timestamp(6)
+  promotion_category promotion_category[]
+}
+
+model promotion_category {
+  id           Int       @id @default(autoincrement())
+  category_id  Int
+  promotion_id Int
+  category     category  @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "category_id_fkey")
+  promotion    promotion @relation(fields: [promotion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "promotion_id_fkey")
+}
+
+model shipping_method {
+  id    Int      @id @default(autoincrement())
+  name  String   @db.VarChar(50)
+  price Decimal? @db.Decimal(10, 2)
+}
+
+model shop_order {
+  id                  Int                 @id @default(autoincrement())
+  user_id             Int
+  order_date          DateTime            @db.Timestamptz(6)
+  payment_method_id   Int
+  shipping_address_id Int
+  shipping_method_id  Int
+  order_total         Decimal             @db.Decimal(10, 2)
+  order_status_id     Int?
+  order_line          order_line[]
+  order_status        order_status?       @relation(fields: [order_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_status_id_fkey")
+  user_payment_method user_payment_method @relation(fields: [payment_method_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payment_method_id_fkey")
+  address             address             @relation(fields: [shipping_address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipping_address_id_fkey")
+  user                user                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_fkey")
+}
+
+model shopping_cart {
+  id                 Int                  @id @default(autoincrement())
+  user_id            Int
+  user               user                 @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_id_fkey")
+  shopping_cart_item shopping_cart_item[]
+}
+
+model shopping_cart_item {
+  id              Int           @id @default(autoincrement())
+  cart_id         Int
+  product_item_id Int
+  qty             Int
+  shopping_cart   shopping_cart @relation(fields: [cart_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "cart_id_fkey")
+  product_item    product_item  @relation(fields: [product_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "product_item_id_fkey")
+}
+
+model user {
+  id                  Int                   @id(map: "User_pkey") @default(autoincrement())
+  full_name           String                @db.VarChar(100)
+  password            String                @db.VarChar
+  created_at          DateTime?             @default(now()) @db.Timestamp(6)
+  email               String                @db.VarChar
+  role                UserRole
+  provider            String?
+  providerId          String?
+  shop_order          shop_order[]
+  shopping_cart       shopping_cart[]
+  user_address        user_address[]
+  user_payment_method user_payment_method[]
+  user_review         user_review[]
+}
+
+model user_address {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  address_id Int
+  is_default Boolean? @default(true)
+  address    address  @relation(fields: [address_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "address_id_fkey")
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_id_fkey")
+}
+
+model user_payment_method {
+  id              Int          @id @default(autoincrement())
+  user_id         Int
+  payment_type_id Int
+  provider        String       @db.VarChar(50)
+  account_number  String       @db.VarChar(19)
+  expiry_date     String       @db.VarChar(5)
+  is_default      Boolean?     @default(true)
+  shop_order      shop_order[]
+  payment_type    payment_type @relation(fields: [payment_type_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payment_type_id_fkey")
+  user            user         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_id_fkey")
+}
+
+model user_review {
+  id                 Int        @id @default(autoincrement())
+  user_id            Int
+  ordered_product_id Int
+  rating_value       String     @db.VarChar(1)
+  comment            String?    @db.VarChar(255)
+  order_line         order_line @relation(fields: [ordered_product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ordered_product_id_fkey")
+  user               user       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_id_fkey")
+}
+
+model variation {
+  id               Int                @id @default(autoincrement())
+  category_id      Int
+  name             String             @db.VarChar
+  category         category           @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "category_id_fkey")
+  variation_option variation_option[]
+}
+
+model variation_option {
+  id                    Int                     @id @default(autoincrement())
+  variation_id          Int
+  value                 String                  @db.VarChar
+  product_configuration product_configuration[]
+  variation             variation               @relation(fields: [variation_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "variation_id_fkey")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
